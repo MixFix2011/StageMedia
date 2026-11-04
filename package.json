@@ -1,0 +1,38 @@
+{
+	"name": "stagemedia",
+	"version": "1.0.0",
+	"description": "Показ фото и видео на проекторе для концертов",
+	"main": "src/main/main.js",
+	"author": "MixFix",
+	"scripts": {
+		"start": "electron .",
+		"dist": "electron-builder --win portable"
+	},
+	"devDependencies": {
+		"electron": "^45.2.1",
+		"electron-builder": "^25.1.8"
+	},
+	"build": {
+		"appId": "com.concert.stagemedia",
+		"productName": "StageMedia",
+		"files": [
+			"src/**/*",
+			"package.json",
+			"icon.ico"
+		],
+		"win": {
+			"icon": "icon.ico",
+			"target": [
+				{
+					"target": "portable",
+					"arch": [
+						"x64"
+					]
+				}
+			]
+		},
+		"portable": {
+			"artifactName": "StageMedia.exe"
+		}
+	}
+}

@@ -1,0 +1,76 @@
+html,
+body {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	height: 100%;
+	width: 100%;
+	background: #000;
+	overflow: hidden;
+	cursor: none;
+	user-select: none;
+}
+
+#stage {
+	position: fixed;
+	inset: 0;
+	background: #000;
+}
+
+.layer {
+	position: absolute;
+	inset: 0;
+	opacity: 0;
+	will-change: opacity;
+	background: #000;
+}
+
+.layer>img,
+.layer>video {
+	width: 100%;
+	height: 100%;
+	display: block;
+	background: #000;
+}
+
+.fit-contain>* {
+	object-fit: contain;
+}
+
+.fit-cover>* {
+	object-fit: cover;
+}
+
+/* Чёрный экран — просто перекрывающий div: включается мгновенно, без анимации */
+#black {
+	position: fixed;
+	inset: 0;
+	background: #000;
+	z-index: 100000;
+	display: block;
+}
+
+#black {
+	position: fixed;
+	inset: 0;
+	background: #000;
+	z-index: 100000;
+	opacity: 1;
+	/* Изначально видим (черный экран) */
+	pointer-events: none;
+	transition: opacity 0.3s ease;
+	/* Плавное появление/исчезновение */
+}
+
+#name {
+	position: fixed;
+	left: 3vw;
+	bottom: 3vh;
+	z-index: 99999;
+	color: #fff;
+	opacity: 0;
+	/* Скрыто по умолчанию */
+	transition: opacity 0.3s ease;
+	font: 600 2.2vw 'Segoe UI', sans-serif;
+	text-shadow: 0 2px 10px #000, 0 0 3px #000;
+}

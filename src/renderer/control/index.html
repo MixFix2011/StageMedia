@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+	<meta charset="utf-8">
+	<title>StageMedia — управление</title>
+	<meta http-equiv="Content-Security-Policy"
+		content="default-src 'self'; img-src 'self' data: file:; style-src 'self' 'unsafe-inline'; script-src 'self'">
+	<link rel="stylesheet" href="control.css">
+</head>
+
+<body>
+	<header>
+		<b class="logo">STAGEMEDIA</b>
+		<span id="outPill" class="pill">…</span>
+		<span id="badge" class="badge black">ЧЁРНЫЙ ЭКРАН</span>
+		<span class="spacer"></span>
+		<button id="btnSupport">💬 Поддержка</button>
+		<button id="btnBg">🖼 Фон</button>
+		<button id="btnLog">Журнал</button>
+		<button id="btnSettings">⚙ Настройки</button>
+	</header>
+	<main>
+		<section id="left">
+			<div id="preview">
+				<img id="prevImg" alt="">
+				<video id="prevVid" muted playsinline
+					style="display:none; position:absolute; inset:0; width:100%; height:100%; object-fit:contain; background:#000;"></video>
+				<div id="prevEmpty">Нет файла на экране</div>
+				<div id="blackMark">ЧЁРНЫЙ ЭКРАН</div>
+			</div>
+			<div id="nowName">—</div>
+			<div id="nowMeta"></div>
+			<div id="progressWrap">
+				<div id="progress"><i id="bar"></i></div><span id="timeLeft"></span>
+			</div>
+			<div id="volumeWrap" style="display: flex; gap: 10px; align-items: center; color: #8b93a3; margin-bottom: 5px;">
+				<span id="volIcon" style="font-size: 20px;">🔊</span>
+				<input type="range" id="volRange" min="0" max="100" style="flex: 1; cursor: pointer;">
+				<span id="volText" style="min-width: 45px; text-align: right; font-variant-numeric: tabular-nums;">100%</span>
+			</div>
+			<div id="notice" class="notice hidden"></div>
+			<div class="bigbtns">
+				<button id="btnPrev">◀ Предыдущий</button>
+				<button id="btnShow">Показать выбранный</button>
+				<button id="btnNext">Следующий ▶</button>
+				<button id="btnPause">⏸ Пауза</button>
+				<button id="btnStop" class="stop">■ СТОП / ЧЁРНЫЙ</button>
+			</div>
+			<div id="nextUp"></div>
+			<div id="hints"></div>
+		</section>
+		<section id="right">
+			<!-- Вкладки -->
+			<div class="tabs" style="display:flex; border-bottom: 1px solid var(--line); margin-bottom: 10px;">
+				<button id="tabQueue" class="active" style="flex:1; padding: 10px;">📋 Очередь</button>
+				<button id="tabExplorer" style="flex:1; padding: 10px;">📁 Проводник</button>
+			</div>
+
+			<!-- Очередь -->
+			<div id="queueView"
+				style="display:flex; flex-direction:column; flex:1; min-height:0; gap:10px; position: relative;">
+				<div class="tools">
+					<button id="btnAddFiles">+ Файлы</button>
+					<button id="btnAddFolder">+ Папка</button>
+					<input type="text" id="expSearch" placeholder="Поиск в папке..."
+						style="flex:1; min-width:100px; background:var(--panel2); border:1px solid var(--line); color:white; border-radius:8px; padding:0 10px;">
+					<input id="search" type="search" placeholder="Поиск по очереди…">
+					<button id="btnView" title="Список / сетка">▦</button>
+					<button id="btnClear">Очистить</button>
+				</div>
+				<div id="queue" class="list"></div>
+				<div id="count"></div>
+				<button id="floatingDeleteBtn" class="floating-delete">🗑 Удалить выбранные</button>
+			</div>
+			</div>
+
+			<!-- Проводник -->
+			<div id="explorerView" style="display:none; flex-direction:column; flex:1; min-height:0; gap:10px;">
+				<!-- Верхняя панель (Желтая и Зеленая зоны) -->
+				<div class="tools" style="align-items: stretch;">
+					<button id="btnExpUp" style="padding: 8px 12px;" title="Наверх">⬆</button>
+					<button id="btnExpPick" style="padding: 8px 12px;">📂 Папка</button>
+
+					<button id="btnExpRemove" class="danger" style="margin-left: auto;" disabled>🗑 Убрать</button>
+					<button id="btnExpAddSelected" style="background: var(--acc); color: white; border-color: var(--acc);"
+						disabled>➕ В очередь</button>
+				</div>
+
+				<div id="expPath"
+					style="color:var(--mut); font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></div>
+				<div id="expList" class="list" style="flex:1; overflow:auto;"></div>
+			</div>
+		</section>
+	</main>
+	<div id="drop">Перетащите файлы или папки сюда</div>
+
+	<div id="bgModal" class="modal">
+		<div class="dlg">
+			<div class="dh"><b>Настройка фона (заглушка)</b><button id="btnCloseBg">Закрыть</button></div>
+			<div id="bgSettingsBody" style="padding: 10px 0;"></div>
+		</div>
+	</div>
+
+	<div id="settingsModal" class="modal">
+		<div class="dlg">
+			<div class="dh"><b>Настройки</b><button id="btnCloseSettings">Закрыть</button></div>
+			<div id="settingsBody"></div>
+		</div>
+	</div>
+
+	<div id="logModal" class="modal">
+		<div class="dlg">
+			<div class="dh"><b>Журнал показа</b><span><button id="btnOpenLogs">Папка логов</button> <button
+						id="btnCloseLog">Закрыть</button></span></div>
+			<pre id="logBody"></pre>
+		</div>
+	</div>
+
+	<div id="supportModal" class="modal">
+		<div class="dlg small">
+			<div class="dh"><b>Связь с разработчиком</b><button id="btnCloseSupport">Закрыть</button></div>
+
+			<p style="color:var(--mut); font-size:14px; margin-bottom:10px;">
+				Опишите проблему. Если что-то сломалось, нажмите кнопку ниже, скопируйте данные и прикрепите их к сообщению.
+			</p>
+
+			<button id="btnCopyLogs"
+				style="width:100%; margin-bottom: 15px; background: var(--acc); color: white; border: none;">📋 Скопировать
+				данные ПК и логи</button>
+
+			<div style="display:flex; gap:10px;">
+				<button id="btnContactTelegram"
+					style="flex:1; background: #0088cc; color: white; border: none; padding: 12px;">Telegram</button>
+				<button id="btnContactEmail" style="flex:1; padding: 12px;">Email</button>
+			</div>
+		</div>
+	</div>
+
+	<div id="confirm" class="modal">
+		<div class="dlg small">
+			<b id="cTitle"></b>
+			<p id="cText"></p>
+			<div class="row"><button id="cNo">Отмена</button><button id="cOk" class="danger">OK</button></div>
+		</div>
+	</div>
+	<script src="control.js"></script>
+</body>
+
+</html>
