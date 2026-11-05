@@ -7,6 +7,50 @@ const log = require('./logger');
 const files = require('./files');
 const output = require('./output-window');
 
+// В самом начале файла, после других require
+const DiscordRPC = require('discord-rpc');
+
+// Ваш Application ID из Discord Developer Portal
+const clientId = '1567946693935108220';
+
+// Создаем клиент для подключения к локальному Discord
+const rpc = new DiscordRPC.Client({ transport: 'ipc' });
+
+// Регистрируем приложение (это включает кнопки "Присоединиться" и т.п.)
+DiscordRPC.register(clientId);
+
+// Функция для установки статуса
+async function setActivity() {
+	if (!rpc) return;
+
+	try {
+		await rpc.setActivity({
+			details: 'Управление медиа', // Верхняя строка статуса
+			state: 'Готов к работе',      // Нижняя строка статуса
+			startTimestamp: new Date(),   // Таймер с момента запуска
+			largeImageKey: 'logo',        // Ключ иконки (см. Шаг 4)
+			largeImageText: 'StageMedia', // Подсказка при наведении на иконку
+			instance: false,
+		});
+	} catch (error) {
+		console.error('Ошибка установки Discord Rich Presence:', error);
+	}
+}
+
+// Когда Discord будет готов, устанавливаем статус
+rpc.on('ready', () => {
+	console.log('Discord RPC подключен!');
+	setActivity();
+
+	// Discord разрешает обновлять статус не чаще раза в 15 секунд
+	setInterval(() => {
+		setActivity();
+	}, 15000);
+});
+
+// Подключаемся к Discord
+rpc.login({ clientId }).catch(console.error);
+
 // ---------- Производительность: GPU, декодирование, без троттлинга ----------
 app.commandLine.appendSwitch('ignore-gpu-blocklist');
 app.commandLine.appendSwitch('enable-gpu-rasterization');
