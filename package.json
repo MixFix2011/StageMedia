@@ -1,6 +1,6 @@
 {
 	"name": "stagemedia",
-	"version": "1.0.1",
+	"version": "1.1.0",
 	"description": "Показ фото и видео на проекторе для концертов",
 	"main": "src/main/main.js",
 	"author": "MixFix",
@@ -33,7 +33,7 @@
 			]
 		},
 		"portable": {
-			"artifactName": "StageMedia.exe"
+			"artifactName": "StageMedia-v${version}.exe"
 		}
 	},
 	"dependencies": {
