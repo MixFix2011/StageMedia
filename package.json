@@ -1,6 +1,6 @@
 {
 	"name": "stagemedia",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "Показ фото и видео на проекторе для концертов",
 	"main": "src/main/main.js",
 	"author": "MixFix",
