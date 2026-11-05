@@ -88,27 +88,56 @@
 		try {
 			let el = await prepare(item).ready;
 			if (my !== seq) return;
+
 			if (item.kind === 'image' && item.ext === '.gif') {
 				el = new Image(); el.src = item.url; await el.decode(); if (my !== seq) return;
 			}
+
 			if (current && current.el === el) {
 				setBlack(false, false);
-				if (item.kind === 'video') { el.currentTime = 0; applyAudio(el); bindVideo(el, item); await el.play(); }
+				if (item.kind === 'video') {
+					el.currentTime = 0;
+					applyAudio(el);
+					bindVideo(el, item);
+					// Безопасный запуск: обрабатываем возможную ошибку прерывания
+					const playPromise = el.play();
+					if (playPromise !== undefined) {
+						playPromise.catch(err => {
+							if (err.name !== 'AbortError') {
+								console.warn('Ошибка воспроизведения:', err);
+							}
+						});
+					}
+				}
 				emit({ type: 'shown', id: item.id, ms: Math.round(performance.now() - t0) });
 				return;
 			}
+
 			const layer = document.createElement('div');
 			layer.className = 'layer fit-' + opts.fit;
 			layer.style.zIndex = ++zTop;
 			layer.appendChild(el);
 			stage.appendChild(layer);
+
 			if (item.kind === 'video') {
-				applyAudio(el); bindVideo(el, item);
+				applyAudio(el);
+				bindVideo(el, item);
 				el.currentTime = 0;
-				await el.play();
+
+				// Безопасный запуск: обрабатываем возможную ошибку прерывания
+				const playPromise = el.play();
+				if (playPromise !== undefined) {
+					playPromise.catch(err => {
+						if (err.name !== 'AbortError') {
+							console.warn('Ошибка воспроизведения:', err);
+						}
+					});
+				}
+
 				await firstFrame(el);
 				if (my !== seq) { el.pause(); layer.remove(); return; }
 			}
+
 			current = { id: item.id, el, kind: item.kind, layer, resume: false };
 			setBlack(false, false);
 			layer.getBoundingClientRect();
@@ -119,11 +148,18 @@
 			const cleanup = () => {
 				for (const l of [...stage.children]) {
 					if (l !== layer && Number(l.style.zIndex) < Number(layer.style.zIndex)) {
-						const v = l.querySelector('video'); if (v) v.pause();
+						const v = l.querySelector('video');
+						if (v) {
+							v.pause();
+							// Дополнительная страховка: очищаем старый источник
+							v.removeAttribute('src');
+							v.load();
+						}
 						l.remove();
 					}
 				}
 			};
+
 			if (opts.fadeMs > 0) setTimeout(cleanup, opts.fadeMs + 50); else cleanup();
 			emit({ type: 'shown', id: item.id, ms: Math.round(performance.now() - t0) });
 		} catch (err) {
